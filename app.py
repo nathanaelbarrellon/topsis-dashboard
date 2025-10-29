@@ -1,13 +1,15 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
 import random
 import plotly.express as px
+from datetime import datetime
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(page_title="TOPSIS Dashboard", page_icon="✈️", layout="wide")
 
-st.title("Multi-Criteria Decision Dashboard (TOPSIS)")
+st.title("Multi-Criteria Decision Making Tool")
 st.write("Interactive multi-criteria analysis using the TOPSIS method to rank simulated aircraft performance.")
 st.markdown("---")
 
@@ -15,7 +17,7 @@ st.markdown("---")
 pd.set_option("styler.render.max_elements", 5_000_000)
 
 # --- GENERAL INPUTS ---
-st.header("⚙️ Simulation Parameters")
+st.header("Simulation Parameters")
 
 col1, col2, col3, col4 = st.columns(4)
 with col1:
@@ -23,9 +25,9 @@ with col1:
 with col2:
     top_n = st.number_input("Top alternatives to display", min_value=1, max_value=n_alternatives, value=10)
 with col3:
-    electrif = st.selectbox("Electrification", ["None", "Hybrid", "Full Electric"])
+    electrif = st.selectbox("Electrification - Unfunctionnal ", ["None", "Hybrid", "Full Electric"])
 with col4:
-    tech_orient = st.radio("Technical orientation", ["Conservative", "Aggressive", "Innovative"])
+    tech_orient = st.radio("Technical orientation - Unfunctional", ["Conservative", "Aggressive", "Innovative"])
 
 st.markdown("---")
 
@@ -39,7 +41,7 @@ inputs = [
     "Trip Fuel (kg)"
 ]
 
-st.header("📊 Criteria Weights")
+st.header("Criteria Weights")
 
 # --- TWO COLUMNS: input weights + pie chart ---
 col_inputs, col_chart = st.columns([3, 2])
@@ -66,7 +68,7 @@ with col_inputs:
 
 with col_chart:
     if 0.999 <= total_weight <= 1.001:
-        st.subheader("🎯 Weight Distribution")
+        st.markdown("<h3 style='text-align: center;'>Weight Distribution</h3>", unsafe_allow_html=True)
 
         weights_df = pd.DataFrame({
             "Criteria": list(weights.keys()),
@@ -137,7 +139,7 @@ if st.button("🚀 Run TOPSIS Analysis"):
 
     df = pd.DataFrame(data)
 
-    st.subheader(f"📋 Simulated Aircraft Data ({n_alternatives} alternatives)")
+    st.subheader(f"Simulated Aircraft Data ({n_alternatives} alternatives)")
     st.dataframe(df, use_container_width=True, hide_index=True)
 
     # --- NORMALIZATION ---
@@ -174,11 +176,11 @@ if st.button("🚀 Run TOPSIS Analysis"):
         return [color] * len(row)
 
     st.markdown("---")
-    st.subheader(f"🏆 TOPSIS Ranking (Top {int(top_n)} Aircraft)")
+    st.subheader(f"TOPSIS Ranking (Top {int(top_n)} Aircraft)")
     st.dataframe(topN.style.apply(highlight_best_row, axis=1), use_container_width=True)
 
     # --- VISUALIZATION (ORDERED LEFT → RIGHT) ---
-    st.markdown(f"### 📈 Top {int(top_n)} Aircraft - TOPSIS Scores")
+    st.markdown(f"### Top {int(top_n)} Aircraft - TOPSIS Scores")
 
     fig = px.bar(
         topN.sort_values(by="TOPSIS Score", ascending=False),
@@ -217,4 +219,4 @@ else:
     st.info("Click **🚀 Run TOPSIS Analysis** to generate simulated aircraft data and compute the ranking.")
 
 st.markdown("---")
-st.caption("Streamlit Prototype - Nathanaël Barrellon/Arthur Daveau ✈️")
+st.caption(f"Streamlit Prototype - last update {datetime.now().strftime('%d %B %Y - %H:%M')}")
